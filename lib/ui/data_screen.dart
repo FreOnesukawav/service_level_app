@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:intl/intl.dart';
 import 'package:pobeda_app/data/data_repository.dart';
 import 'package:pobeda_app/models/sheet_data.dart';
 import 'package:pobeda_app/ui/detail_screen.dart';
@@ -101,10 +102,13 @@ class _DataScreenState extends State<DataScreen> {
       return const Center(child: Text('No data found.'));
     }
 
+    final sortedData = _data!.reversed.toList();
+
     return RefreshIndicator(
       onRefresh: () => _loadData(forceRefresh: true),
       child: AnimationLimiter(
         child: GridView.builder(
+          reverse: true,
           padding: const EdgeInsets.all(12.0),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
@@ -112,9 +116,9 @@ class _DataScreenState extends State<DataScreen> {
             mainAxisSpacing: 12.0,
             childAspectRatio: 1.0,
           ),
-          itemCount: _data!.length,
+          itemCount: sortedData.length,
           itemBuilder: (context, index) {
-            final itemData = _data![index];
+            final itemData = sortedData[index];
             return AnimationConfiguration.staggeredGrid(
               position: index,
               duration: const Duration(milliseconds: 375),
@@ -143,6 +147,8 @@ class _DataScreenState extends State<DataScreen> {
   }
 
   Widget _buildDataCard(SheetData data) {
+    final dayOfWeek = DateFormat.EEEE('ru_RU').format(data.parsedDate);
+
     return Card(
       elevation: 4.0,
       shape: RoundedRectangleBorder(
@@ -152,13 +158,22 @@ class _DataScreenState extends State<DataScreen> {
         padding: const EdgeInsets.all(12.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               data.date,
               style: const TextStyle(
-                fontSize: 16.0,
+                fontSize: 18.0,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              dayOfWeek,
+              style: const TextStyle(
+                fontSize: 14.0,
+                color: Colors.white70,
               ),
             ),
             const Spacer(),
