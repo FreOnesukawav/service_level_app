@@ -200,12 +200,20 @@ class _StatsScreenState extends State<StatsScreen> {
     final changeFrov = currentFrov - prevFrov;
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _buildComparisonCard("Охлажденка", currentOhl, changeOhl, Colors.blue),
-        _buildComparisonCard(
-            "Заморозка", currentZam, changeZam, Colors.lightBlue),
-        _buildComparisonCard("ФРОВ", currentFrov, changeFrov, Colors.green),
+        Expanded(
+          child: _buildComparisonCard(
+              "Охлажденка", currentOhl, changeOhl, Colors.blue),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: _buildComparisonCard(
+              "Заморозка", currentZam, changeZam, Colors.lightBlue),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+            child: _buildComparisonCard(
+                "ФРОВ", currentFrov, changeFrov, Colors.green)),
       ],
     );
   }
@@ -358,10 +366,18 @@ class _StatsScreenState extends State<StatsScreen> {
       if (frovData.isNotEmpty) _lineBarData(frovData, Colors.green, 'ФРОВ'),
     ];
 
+    double minVal = 100;
+    double maxVal = 0;
+    final allSpots = [...ohlData, ...zamData, ...frovData];
+    if (allSpots.isNotEmpty) {
+      minVal = allSpots.map((spot) => spot.y).reduce((a, b) => a < b ? a : b);
+      maxVal = allSpots.map((spot) => spot.y).reduce((a, b) => a > b ? a : b);
+    }
+
     return LineChart(
       LineChartData(
-        minY: 95,
-        maxY: 105,
+        minY: (minVal - 1).floorToDouble(),
+        maxY: (maxVal + 1).ceilToDouble(),
         lineBarsData: lineBarsData,
         titlesData: FlTitlesData(
           leftTitles: AxisTitles(
